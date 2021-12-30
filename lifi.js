@@ -1,48 +1,46 @@
-require('dotenv').config()
-
+import dotenv from "dotenv";
 import sdk from "@lifinance/sdk";
 import ethers from "ethers";
+import NETWORKS from "./configs.js";
 
-const NETWORKS = require('./configs').NETWORKS;
+dotenv.config();
 const Lifi = sdk.default;
 
 const SETTINGS = {
-  FROM: NETWORKS.POLYGON,
-  TO: NETWORKS.XDAI,
+  FROM: NETWORKS.XDAI,
+  TO: NETWORKS.POLYGON,
   SLIPPAGE: 0.03,
-  AMOUNT: "1000000" // 1 USDT
+  AMOUNT: 1000000 / 4 // 0.25 USDT
 }
 
 async function main() {
-  // setup wallet
+
   if (!process.env.PRIVATE_KEY) {
-    console.warn(
-      'Please specify a PRIVATE_KEY phrase in your .env file: `PRIVATE_KEY="..."`'
-    );
+    console.warn('[x] Please specify a PRIVATE_KEY phrase in your .env file: `PRIVATE_KEY="..."`');
     return;
   }
-  console.log(">> Setup Wallet");
-  const provider = new ethers.providers.JsonRpcProvider(SETTINGS.FROM.RPC, SETTINGS.FROM.CHAINID);
+
+  console.log("[i] Setup Wallet");
+  const provider = new ethers.providers.JsonRpcProvider(NETWORKS.POLYGON.RPC, NETWORKS.POLYGON.CHAINID);
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
 
   // get Route
-  console.log(">> Request route");
+  console.log("[i] Requesting route");
   const routeRequest = {
-    fromChainId: SETTINGS.FROM.CHAINID, // Polygon
-    fromAmount: SETTINGS.AMOUNT, // 1 USDT
-    fromTokenAddress: SETTINGS.FROM.TOKEN_ADDRESSES.USDT, // USDT
-    toChainId: SETTINGS.TO.CHAINID, // xDai
-    toTokenAddress: SETTINGS.TO.TOKEN_ADDRESSES.USDT, // USDT
+    fromChainId: SETTINGS.FROM.CHAINID,
+    fromAmount: SETTINGS.AMOUNT.toString(),
+    fromTokenAddress: SETTINGS.FROM.TOKEN_ADDRESSES.USDT,
+    toChainId: SETTINGS.TO.CHAINID,
+    toTokenAddress: SETTINGS.TO.TOKEN_ADDRESSES.USDT,
     options: { slippage: SETTINGS.SLIPPAGE },
   };
 
   const routeResponse = await Lifi.getRoutes(routeRequest);
   const route = routeResponse.routes[0];
-  console.log(">> Got Route");
+  console.log("[i] Getting route");
   console.log(route);
 
-  // execute Route
-  console.log(">> Start Execution");
+  console.log("[i] Starting Execution");
   const settings = {
     updateCallback: (updatedRoute) => {
       let lastExecution;
@@ -54,14 +52,14 @@ async function main() {
       console.log(lastExecution);
     },
     switchChainHook: async (requiredChainId) => {
-      console.log(">>Switching Chains");
-      const provider = new ethers.providers.JsonRpcProvider(SETTINGS.TO.RPC, SETTINGS.TO.CHAINID);
+      console.log("[i] Switching Chains");
+      const provider = new ethers.providers.JsonRpcProvider(SETTINGS.TO.RPC, requiredChainId);
       const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
       return wallet;
     },
   };
   await Lifi.executeRoute(wallet, route, settings);
-  console.log("DONE");
+  console.log("[i] Done!");
 }
 
 main();

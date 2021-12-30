@@ -15,4 +15,4 @@ const NETWORKS = {
     },
 }
 
-module.exports = { NETWORKS }
+export default NETWORKS;
