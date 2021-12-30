@@ -21,7 +21,7 @@ async function main() {
   }
 
   console.log("[i] Setup Wallet");
-  const provider = new ethers.providers.JsonRpcProvider(NETWORKS.POLYGON.RPC, NETWORKS.POLYGON.CHAINID);
+  const provider = new ethers.providers.JsonRpcProvider(SETTINGS.FROM.RPC, SETTINGS.FROM.CHAINID);
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
 
   // get Route
