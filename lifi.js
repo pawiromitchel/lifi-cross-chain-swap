@@ -1,20 +1,12 @@
 import dotenv from "dotenv";
 import sdk from "@lifinance/sdk";
 import ethers from "ethers";
-import NETWORKS from "./configs.js";
+import SETTINGS from "./config/settings.js"
 
 dotenv.config();
 const Lifi = sdk.default;
 
-const SETTINGS = {
-  FROM: NETWORKS.XDAI,
-  TO: NETWORKS.POLYGON,
-  SLIPPAGE: 0.03,
-  AMOUNT: 1000000 / 4 // 0.25 USDT
-}
-
 async function main() {
-
   if (!process.env.PRIVATE_KEY) {
     console.warn('[x] Please specify a PRIVATE_KEY phrase in your .env file: `PRIVATE_KEY="..."`');
     return;
