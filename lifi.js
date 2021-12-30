@@ -5,9 +5,9 @@ const Lifi = sdk.default;
 
 async function demo() {
   // setup wallet
-  if (!process.env.MNEMONIC) {
+  if (!process.env.PRIVATE_KEY) {
     console.warn(
-      'Please specify a MNEMONIC phrase in your environment variables: `export MNEMONIC="..."`'
+      'Please specify a PRIVATE_KEY phrase in your environment variables: `export PRIVATE_KEY="..."`'
     );
     return;
   }
@@ -16,7 +16,7 @@ async function demo() {
     "https://polygon-rpc.com/",
     137
   );
-  const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC).connect(
+  const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(
     provider
   );
 
@@ -54,7 +54,7 @@ async function demo() {
         "https://rpc.xdaichain.com/",
         requiredChainId
       );
-      const wallet = ethers.Wallet.fromMnemonic(process.env.MNEMONIC).connect(
+      const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(
         provider
       );
       return wallet;
