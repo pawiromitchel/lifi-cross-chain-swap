@@ -5,7 +5,7 @@
 2. use the `config/networks.js` to add token addresses or other networks
 3. change the settings in the `config/settings.js`
 
-*Please double check how much decimals the token has you want to swap from*
+⚠ *Please double check how much decimals the token has you want to swap from*
 ```js
 const SETTINGS = {
   FROM: NETWORKS.XDAI,
