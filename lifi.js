@@ -31,7 +31,8 @@ async function main() {
   const route = routeResponse.routes[0];
   console.log("[i] Getting route");
   console.log(route);
-  console.log(`[i] Fee: $${route.fromAmountUSD - route.toAmountUSD}`);
+  console.log(`[i] Bridge Fee: $${route.fromAmountUSD - route.toAmountUSD}`);
+  console.log(`[i] Gas Fee: $${route.gasCostUSD}`);
 
   // check if there's a route for the bridging
   if(route) {
