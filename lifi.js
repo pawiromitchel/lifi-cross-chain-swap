@@ -1,34 +1,39 @@
+require('dotenv').config()
+
 import sdk from "@lifinance/sdk";
 import ethers from "ethers";
 
+const NETWORKS = require('./configs').NETWORKS;
 const Lifi = sdk.default;
 
-async function demo() {
+const SETTINGS = {
+  FROM: NETWORKS.POLYGON,
+  TO: NETWORKS.XDAI,
+  SLIPPAGE: 0.03,
+  AMOUNT: "1000000" // 1 USDT
+}
+
+async function main() {
   // setup wallet
   if (!process.env.PRIVATE_KEY) {
     console.warn(
-      'Please specify a PRIVATE_KEY phrase in your environment variables: `export PRIVATE_KEY="..."`'
+      'Please specify a PRIVATE_KEY phrase in your .env file: `PRIVATE_KEY="..."`'
     );
     return;
   }
   console.log(">> Setup Wallet");
-  const provider = new ethers.providers.JsonRpcProvider(
-    "https://polygon-rpc.com/",
-    137
-  );
-  const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(
-    provider
-  );
+  const provider = new ethers.providers.JsonRpcProvider(SETTINGS.FROM.RPC, SETTINGS.FROM.CHAINID);
+  const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
 
   // get Route
   console.log(">> Request route");
   const routeRequest = {
-    fromChainId: 137, // Polygon
-    fromAmount: "1000000", // 1 USDT
-    fromTokenAddress: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", // USDT
-    toChainId: 100, // xDai
-    toTokenAddress: "0x4ecaba5870353805a9f068101a40e0f32ed605c6", // USDT
-    options: { slippage: 0.03 },
+    fromChainId: SETTINGS.FROM.CHAINID, // Polygon
+    fromAmount: SETTINGS.AMOUNT, // 1 USDT
+    fromTokenAddress: SETTINGS.FROM.TOKEN_ADDRESSES.USDT, // USDT
+    toChainId: SETTINGS.TO.CHAINID, // xDai
+    toTokenAddress: SETTINGS.TO.TOKEN_ADDRESSES.USDT, // USDT
+    options: { slippage: SETTINGS.SLIPPAGE },
   };
 
   const routeResponse = await Lifi.getRoutes(routeRequest);
@@ -50,19 +55,13 @@ async function demo() {
     },
     switchChainHook: async (requiredChainId) => {
       console.log(">>Switching Chains");
-      const provider = new providers.JsonRpcProvider(
-        "https://rpc.xdaichain.com/",
-        requiredChainId
-      );
-      const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(
-        provider
-      );
+      const provider = new ethers.providers.JsonRpcProvider(SETTINGS.TO.RPC, SETTINGS.TO.CHAINID);
+      const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
       return wallet;
     },
   };
   await Lifi.executeRoute(wallet, route, settings);
-
   console.log("DONE");
 }
 
-demo();
+main();
