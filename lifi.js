@@ -32,26 +32,32 @@ async function main() {
   console.log("[i] Getting route");
   console.log(route);
 
-  console.log("[i] Starting Execution");
-  const settings = {
-    updateCallback: (updatedRoute) => {
-      let lastExecution;
-      for (const step of updatedRoute.steps) {
-        if (step.execution) {
-          lastExecution = step.execution;
+  // check if there's a route for the bridging
+  if(route) {
+    console.log("[i] Starting Execution");
+    const settings = {
+      updateCallback: (updatedRoute) => {
+        let lastExecution;
+        for (const step of updatedRoute.steps) {
+          if (step.execution) {
+            lastExecution = step.execution;
+          }
         }
-      }
-      console.log(lastExecution);
-    },
-    switchChainHook: async (requiredChainId) => {
-      console.log("[i] Switching Chains");
-      const provider = new ethers.providers.JsonRpcProvider(SETTINGS.TO.RPC, requiredChainId);
-      const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
-      return wallet;
-    },
-  };
-  await Lifi.executeRoute(wallet, route, settings);
-  console.log("[i] Done!");
+        console.log(lastExecution);
+      },
+      switchChainHook: async (requiredChainId) => {
+        console.log("[i] Switching Chains");
+        const provider = new ethers.providers.JsonRpcProvider(SETTINGS.TO.RPC, requiredChainId);
+        const wallet = new ethers.Wallet(process.env.PRIVATE_KEY).connect(provider);
+        return wallet;
+      },
+    };
+    await Lifi.executeRoute(wallet, route, settings);
+    console.log("[i] Done!");
+  } else {
+    console.warn('[x] No route found, please try again');
+    return;
+  }
 }
 
 main();
