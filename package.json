@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@lifinance/sdk": "^0.4.0",
+    "@lifinance/sdk": "^0.5.0",
     "dotenv": "^10.0.0"
   }
 }
